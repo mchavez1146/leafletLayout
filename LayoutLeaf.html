@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>CRS.Simple Ejemplo con cualquier imagen - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+
+		#map {
+			height:100%;
+			width:100%;
+
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+
+<script>
+
+
+	var map = L.map('map', {
+		crs: L.CRS.Simple,
+		minZoom: -2
+	});
+// El zoom depende de que tan cerca quieras acercarte en el mapa al inicio 
+
+// Esta parte es para cambia el formato de YX a XY.. Solo para este caso CRS.simple las coordenadas vienen invertidas
+	var yx = L.latLng;
+
+	var xy = function(x, y) {
+		if (L.Util.isArray(x)) {    // When doing xy([x, y]);
+			return yx(x[1], x[0]);
+		}
+		return yx(y, x);  // When doing xy(x, y);
+	};
+
+// los bounds son los limites de la imagen Minimo de Pixel y Maximo de Pixeles
+// estos se pueden escalar de forma diferente en la imagen para tener coordenadas diferentes 
+// en este caso se tomo las dimensiones de la imagen en pixeles
+
+	var bounds = [xy(0, 0), xy(3917,2433)];
+
+
+
+
+	var image = L.imageOverlay('6C.jpg', bounds).addTo(map);
+
+	
+//Vamos a colocar unos marcadores para identificar las posiciones en el mapa para ejemplo de panoramas
+
+	var Pano1    = xy(342,275);
+	var Pano2    = xy( 692.5, 554);
+	var Pano3    = xy( 1218, 831);
+	var Pano4    = xy(3608.43, 1767);
+
+	L.marker(Pano1).addTo(map).bindPopup('965');
+	L.marker(Pano2).addTo(map).bindPopup('961');
+	L.marker(Pano3).addTo(map).bindPopup('923');
+	L.marker(Pano4).addTo(map).bindPopup('819');
+
+
+// Se coloca al centro (tenemos que dividir los bounds maximos entre 2 y usar el mismo min zoom para la vista inicial
+	map.setView(xy(1958, 1200),-2);
+
+
+// Popup para validar el punto donde se da doble click para ver coordenadas del punto para poner marcador	
+	
+	var popup = L.popup();
+
+	function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+		L.marker(e.latlng).addTo(map);
+		}
+
+	
+map.on('dblclick', onMapClick);
+
+</script>
+
+
+
+</body>
+</html>
